@@ -1,4 +1,4 @@
-# World Architecture — Echoes of the Forgotten Kingdom (Version 2, Unity)
+# World Architecture — Elvareth (Unity)
 
 | | |
 |---|---|
@@ -446,11 +446,10 @@ M4 is the real test of this document.
 | Platforms | PC. Windows first; macOS and Linux desktop later. |
 | Development machine | The owner's computer runs the Unity Editor. |
 | "Celestial Sanctuary" name clash | Resolved by the new story — version 1 regions do not exist in version 2. |
+| Title | The new game is called **Elvareth**. "Echoes of the Forgotten Kingdom" remains the name of version 1 only. |
 | Starting point | The game begins in the **Grand Sanctuary**. It is the first place the player sees; at the start it is almost entirely Dormant, and it awakens as the journey progresses. |
 
 ### Open
 
-1. **Title.** Does the game stay "Echoes of the Forgotten Kingdom" with a new story, or will the new
-   story get a new title? Is the world still called Elvareth?
-2. **Story bible.** Should Claude draft a first story outline for the owner to react to, or does the
-   owner write the core idea first?
+1. **Story bible.** Claude drafts the first outline in `docs/STORY_BIBLE.md` (separate pull
+   request); the owner reviews and decides. Story questions are tracked there, not here.

@@ -1,4 +1,6 @@
-# Echoes of the Forgotten Kingdom — Version 2 (Unity)
+# Elvareth (Unity)
+
+Repository name keeps "echoes-forgotten-kingdom-version2"; the game itself is called **Elvareth**.
 
 First-person 3D fantasy exploration and puzzle game for PC (Windows first; macOS and Linux later).
 No guns, no shooting. Version 2 is a new game in Unity with a **new story**: do not reuse
