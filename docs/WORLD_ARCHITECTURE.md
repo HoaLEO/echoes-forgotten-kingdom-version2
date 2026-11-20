@@ -446,12 +446,11 @@ M4 is the real test of this document.
 | Platforms | PC. Windows first; macOS and Linux desktop later. |
 | Development machine | The owner's computer runs the Unity Editor. |
 | "Celestial Sanctuary" name clash | Resolved by the new story — version 1 regions do not exist in version 2. |
+| Starting point | The game begins in the **Grand Sanctuary**. It is the first place the player sees; at the start it is almost entirely Dormant, and it awakens as the journey progresses. |
 
 ### Open
 
-1. **Where does the game begin?** In the Grand Sanctuary, or in a first domain where the player
-   discovers the Sanctuary later? (The answer received was incomplete.)
-2. **Title.** Does the game stay "Echoes of the Forgotten Kingdom" with a new story, or will the new
+1. **Title.** Does the game stay "Echoes of the Forgotten Kingdom" with a new story, or will the new
    story get a new title? Is the world still called Elvareth?
-3. **Story bible.** Should Claude draft a first story outline for the owner to react to, or does the
+2. **Story bible.** Should Claude draft a first story outline for the owner to react to, or does the
    owner write the core idea first?
