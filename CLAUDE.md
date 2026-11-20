@@ -1,7 +1,9 @@
 # Echoes of the Forgotten Kingdom — Version 2 (Unity)
 
-First-person 3D fantasy exploration and puzzle game set in the world of Elvareth. No guns, no
-shooting. Version 2 is a Unity rebuild of the earlier Three.js browser game.
+First-person 3D fantasy exploration and puzzle game for PC (Windows first; macOS and Linux later).
+No guns, no shooting. Version 2 is a new game in Unity with a **new story**: do not reuse
+characters, lore or plot from the earlier Three.js browser game. The owner runs the Unity Editor on
+a computer with a weak integrated GPU — keep Editor scenes light.
 
 ## Read first
 

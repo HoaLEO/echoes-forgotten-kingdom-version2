@@ -11,9 +11,13 @@
 
 ## 1. Purpose
 
-Version 1 of the game (Three.js, single `index.html`) proved the story, the puzzles and the art
-direction, but every new region required edits to core code. Version 2 is rebuilt in Unity on a
-foundation that is designed once and then left alone, so the world can keep growing for years.
+Version 2 is a **new game** built in Unity: a new world and a new story. The story and lore of
+version 1 (Three.js, single `index.html`) are not carried over. What carries over are the lessons
+learned — above all that in version 1 every new region required edits to core code — and selected
+gameplay concepts where they fit the new story (section 13).
+
+Version 2 is built on a foundation that is designed once and then left alone, so the world can keep
+growing for years.
 
 This document separates two things and keeps them separate everywhere — in folders, in assemblies,
 in save data and in how we work:
@@ -57,7 +61,7 @@ ELVARETH  (the Eternal Nexus)
 ├── Level 1 · THE GRAND SANCTUARY          central hub — exactly one
 │
 └── Level 2 · GREAT DOMAINS                independent realms, reached through great gates
-      │        e.g. The Forgotten Kingdom, The Kingdom Beneath, The Astral Lands
+      │        e.g. The Great Ascent, and further realms defined by the new story
       │
       └── Level 3 · REGIONAL SANCTUARIES   hubs inside a domain: a city, temple, camp, waystation
             │
@@ -84,8 +88,8 @@ to go anywhere. Locations also connect **directly** to each other through `Conne
 - **Tree** (parent/child) → project organisation, world map drill-down, loading groups.
 - **Graph** (connections) → how the player actually walks through the world.
 
-Version 1 already works this way (the Great Ascent leads physically into the Great Cavern), and
-that feeling of one continuous journey must be kept.
+Version 1 showed that the feeling of one continuous journey — walking from a mountain straight
+down into a cave — is worth more than any menu, and it must be kept.
 
 ## 4. The Living Sanctuary
 
@@ -127,9 +131,8 @@ code do not change.
 "Stirring" is how progressive discovery works *inside the world* instead of through UI: the player
 sees a sealed arch long before they hold the key for it.
 
-**Proposed rule (needs approval):** growth that is earned while the player is away is queued and
-performed when they next enter the Sanctuary, so they witness it happen rather than finding it
-already done.
+**Rule (approved):** growth that is earned while the player is away is queued and performed when
+they next enter the Sanctuary, so they witness it happen rather than finding it already done.
 
 ### 4.4 How one building can hold an unlimited world
 
@@ -221,12 +224,14 @@ All persistent progress is stored as **facts**: a map from a stable ID to an int
 
 | Fact | Example key | Value |
 |---|---|---|
-| Flag | `flag.kingdom.echo_gate_opened` | 0 or 1 |
-| Discovery state | `loc.forgotten_kingdom.whispering_forest` | 0–4 (section 5.1) |
-| Inventory | `item.relic.root` | count |
-| Sanctuary growth | `sanctuary.gate.kingdom_beneath` | 0 dormant, 1 stirring, 2 awakened |
-| Quest progress | `quest.kingdom.three_callings` | step index |
-| Interactable state | `obj.forgotten_kingdom.courtyard.rune_door` | state value |
+| Flag | `flag.sanctuary.first_gate_opened` | 0 or 1 |
+| Discovery state | `loc.great_ascent.north_face` | 0–4 (section 5.1) |
+| Inventory | `item.key.ancient_01` | count |
+| Sanctuary growth | `sanctuary.gate.great_ascent` | 0 dormant, 1 stirring, 2 awakened |
+| Quest progress | `quest.main.prologue` | step index |
+| Interactable state | `obj.great_ascent.base_camp.rope_winch` | state value |
+
+(All IDs in this document are illustrations; real IDs are assigned when content is designed.)
 
 One uniform store means conditions, saves, migrations and debugging tools all work on the same
 simple thing.
@@ -253,8 +258,8 @@ needs to branch on content, that is a missing condition type.
 IDs are the backbone of backward compatibility.
 
 - Format: lowercase segments of `a–z`, `0–9`, `_`, separated by dots.
-  `domain.forgotten_kingdom` · `hub.forgotten_kingdom.courtyard` ·
-  `loc.forgotten_kingdom.sunken_temple` · `item.key.ancient_01` · `lore.kingdom.founding_03`
+  `domain.great_ascent` · `hub.great_ascent.base_camp` ·
+  `loc.great_ascent.north_face` · `item.key.ancient_01` · `lore.sanctuary.founding_03`
 - An ID is **assigned once and never changed, never reused** — even if the display name, the parent
   hub or the scene changes.
 - The prefix is a naming convention for humans. Code treats an ID as an opaque string and never
@@ -282,7 +287,7 @@ Bootstrap scene (always loaded)
   definitions.
 - **One place in memory at a time.** Memory use depends on the place the player is in, not on how
   large the world has become. This is what lets the world grow without the game getting heavier.
-- Very large locations (the Great Cavern) are split into sub-scenes that load and unload by
+- Very large locations (a vast cave system, for example) are split into sub-scenes that load and unload by
   position — the Unity equivalent of the region-visibility system that fixed performance in
   version 1.
 - Transitions follow one path for every gate, portal and connection: save facts → fade → unload →
@@ -318,7 +323,7 @@ Assets/
 │   │   ├── Sanctuary/             growth system
 │   │   ├── Discovery/             discovery states, map, guidance
 │   │   ├── Interaction/           interactables, pickups, doors
-│   │   ├── Player/                first-person controller, input (desktop + touch)
+│   │   ├── Player/                first-person controller, input (keyboard/mouse + gamepad)
 │   │   └── UI/  Audio/
 │   ├── Editor/                    ID validator, world index generator, authoring tools
 │   └── Tests/                     edit-mode and play-mode tests
@@ -330,7 +335,7 @@ Assets/
 │
 └── Content/                       THE WORLD CONTENT — grows continuously
     ├── Sanctuary/                 base scene, growth scenes, growth nodes
-    ├── ForgottenKingdom/          one folder per domain:
+    ├── GreatAscent/               one folder per domain:
     │   ├── Data/                  definitions for this domain
     │   ├── Hubs/  Locations/      scenes
     │   ├── Art/  Audio/
@@ -371,62 +376,82 @@ meaning of existing data.
 - The architecture supports an unlimited number of places. It does not make them free. Every
   location still costs design time, art, storage and optimisation. 2,000 quality maps is a
   multi-year production goal, not something the architecture produces.
-- Performance targets carry over from version 1: about 60 FPS at 1080p on a reasonably capable
-  desktop GPU, with meaningful Low / Medium / High / Ultra presets and dedicated mobile presets.
-  Weak integrated GPUs get a best-effort Low preset.
-- Render pipeline: URP (chosen for weak hardware and mobile).
+- **Platforms:** PC first. The first release targets **Windows**. macOS and Linux desktop builds
+  are planned later; Unity can produce them, but a signed, notarised macOS build normally needs a
+  Mac. Mobile and web are not targets; nothing in the core may assume they will never come, but no
+  work is spent on them now.
+- Performance target: about 60 FPS at 1080p on a reasonably capable desktop GPU, with meaningful
+  Low / Medium / High / Ultra presets. Weak integrated GPUs get a best-effort Low preset.
+- **Development machine:** the Unity Editor runs on the owner's computer, which has a weak
+  integrated GPU. Consequences: greybox first; keep Editor scenes light (sub-scenes, no huge
+  always-loaded geometry); prefer realtime or cheap lighting during early milestones and schedule
+  heavy light baking deliberately. Editor frame rate on this machine is not a measure of the
+  game's performance on target hardware.
+- Render pipeline: URP (scales down to weak hardware; HDRP would be too heavy for the development
+  machine).
 - Each location declares a **budget tier**; budgets are measured, not assumed. No performance claim
   is made without a real measurement on real hardware, and the hardware is named.
 - Build size grows with content. Addressables groups per domain allow content to be shipped and
   updated as separate packs when the base build becomes too large.
-- Input: one set of gameplay actions with desktop (keyboard and mouse) and touch (virtual stick and
-  buttons) bindings, as required in version 1.
+- Input: Unity Input System with one set of gameplay actions. Bindings: keyboard and mouse, and
+  gamepad. Other devices can be added later as new bindings without touching gameplay code.
 
-## 13. Mapping version 1 content (proposal — needs owner decision)
+## 13. Relationship to version 1
 
-| Version 1 | Proposed place in the Nexus |
+Version 2 has a **new story**, unrelated to version 1. No characters, lore, chapters, endings or
+item names are carried over.
+
+What does carry over:
+
+| From version 1 | In version 2 |
 |---|---|
-| Forgotten Courtyard | Domain *The Forgotten Kingdom* → Regional Sanctuary (the kingdom's hub) |
-| Whispering Forest, Sunken Temple, Celestial Sanctuary | Locations in *The Forgotten Kingdom* |
-| The Great Ascent | Location in *The Forgotten Kingdom* (mountain), **or** its own domain |
-| The Great Cavern, The Chamber of Light | Domain *The Kingdom Beneath* |
-| Three relic fragments, Echo Gate, Star Key | Items, facts and conditions |
-| Rune sequence, crystal reflection, pressure plates | Core/Systems puzzles used by locations |
-| Four-chapter story, three endings | Quests + conditions; endings set facts and return the player to a checkpoint |
-
-Story, lore and approved design decisions from version 1 are carried over as content. Version 1
-code is not reused.
+| Lesson: new regions forced core code changes | Architecture vs Content separation (section 2) |
+| Lesson: saves keyed by registration order were fragile | Stable IDs and versioned saves (sections 7, 9) |
+| Lesson: players could not find new entrances | Discovery states and data-driven guidance (section 5) |
+| Lesson: rendering everything at once killed performance | One place in memory, sub-scenes (section 8) |
+| Concept: **The Great Ascent** (mountain, controlled climbing routes) | **Approved:** becomes its own Great Domain in the new world. Its name, place and story role are designed with the new story. |
+| Other concepts (a vast cave inspired by real limestone caves, light-reflection puzzles, rune sequences, pressure plates) | Candidates only. Each returns only if it fits the new story, and is redesigned as new content. |
 
 ## 14. Milestones
 
 Each milestone ends with a report: what was built, what was tested and how, and what is still
-unverified. Play-testing happens in the Unity Editor on the owner's side; anything not actually run
-there is labelled untested.
+unverified. Play-testing happens in the Unity Editor on the owner's computer; anything not actually
+run there is labelled untested.
 
 | # | Milestone | Result |
 |---|---|---|
-| M0 | Project setup | Unity LTS version pinned, URP, packages, Git LFS, folder and assembly skeleton. Opens with zero errors. |
+| M0 | Project setup | Unity LTS version pinned, URP, Input System, Addressables, Git LFS, folder and assembly skeleton. Opens with zero errors on the owner's machine. |
 | M1 | Core skeleton | IDs, definitions, facts, conditions/effects, save + migration, registry, validator. Covered by edit-mode tests. No visuals. |
-| M2 | Vertical slice | Greybox Grand Sanctuary → one domain gate → one Regional Sanctuary → one Location and back. Save, load, discovery map. |
-| M3 | Living Sanctuary | Growth nodes with Dormant / Stirring / Awakened; one wing, one gate, one corridor, one World Tree branch, driven only by data. |
+| M2 | Vertical slice | Greybox Grand Sanctuary → one domain gate → one Regional Sanctuary → one Location and back. Fast travel, save, load, discovery map. |
+| M3 | Living Sanctuary | Growth nodes with Dormant / Stirring / Awakened and queued awakenings; one wing, one gate, one corridor, one World Tree branch, driven only by data. |
 | M4 | Proof of the principles | Add a second Location and a second Domain **without editing `_Core`**. If the core has to change, the architecture is fixed before any real content is built. |
-| M5+ | Content | Rebuild version 1 chapters as content, in order; visual quality passes. |
+| M5+ | Content | The new story's first domains, built as content, starting with the vertical-slice domain. |
+
+In parallel with M0–M4 (no code): **Story bible** — the new world, its history, the Grand
+Sanctuary and World Tree in the story, the first domains including the Great Ascent, and the
+player's goal. Approved by the owner before M5.
 
 M4 is the real test of this document.
 
-## 15. Open questions for the owner
+## 15. Decisions and open questions
 
-1. **Where does the game begin?** In the Grand Sanctuary (the player first walks out through the
-   Forgotten Kingdom gate), or in the Forgotten Courtyard as in version 1, with the Sanctuary
-   discovered later?
-2. **How do the Echo Gate, the Heartstone and the World Tree relate?** Version 1's truth (the
-   Heartstone was the mountain's heart) is approved canon. The Sanctuary and World Tree are new and
-   need a place in that story.
-3. **Is the Great Ascent part of The Forgotten Kingdom or its own domain?**
-4. **Naming:** the existing region "Celestial Sanctuary" and the new "Grand Sanctuary" are easy to
-   confuse. Keep both names, or rename one?
-5. **Fast travel:** may the player travel instantly between visited Regional Sanctuaries and the
-   Grand Sanctuary, or is all travel on foot through gates?
-6. **Queued awakenings** (section 4.3): approve or change.
-7. **Target platforms** for the first release: Windows only, Windows + Android, also iOS, also web?
-8. **Development machine:** which computer will run the Unity Editor?
+### Decided (2026-11-20)
+
+| Topic | Decision |
+|---|---|
+| Story | A completely new story, unrelated to version 1. |
+| The Great Ascent | Its own Great Domain, placed somewhere in the new world. |
+| Fast travel | Yes — between visited Regional Sanctuaries and the Grand Sanctuary. |
+| Growth while away | Queued and performed when the player returns (section 4.3). |
+| Platforms | PC. Windows first; macOS and Linux desktop later. |
+| Development machine | The owner's computer runs the Unity Editor. |
+| "Celestial Sanctuary" name clash | Resolved by the new story — version 1 regions do not exist in version 2. |
+
+### Open
+
+1. **Where does the game begin?** In the Grand Sanctuary, or in a first domain where the player
+   discovers the Sanctuary later? (The answer received was incomplete.)
+2. **Title.** Does the game stay "Echoes of the Forgotten Kingdom" with a new story, or will the new
+   story get a new title? Is the world still called Elvareth?
+3. **Story bible.** Should Claude draft a first story outline for the owner to react to, or does the
+   owner write the core idea first?
